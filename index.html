@@ -3,33 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Жас маман 2.0</title>
+    <title>Жас маман 2.0 | Интерактив</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@300;400;600;700&display=swap');
         
         :root {
             --primary: #00f2fe;
             --secondary: #7000ff;
             --accent: #ff00c8;
-            --bg: #030712;
-            --card-bg: rgba(255, 255, 255, 0.05);
+            --success: #00ff88;
+            --bg: #020617;
+            --card-bg: rgba(15, 23, 42, 0.7);
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: var(--bg);
             color: white;
-            margin: 0;
-            padding: 0;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
 
+        /* Қозғалыстағы фон */
         #canvas-bg {
             position: fixed;
             top: 0;
@@ -37,7 +39,7 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
         }
 
         .orbitron {
@@ -53,107 +55,81 @@
             align-items: center;
             padding: 80px 20px;
             text-align: center;
-            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease-out;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 15px;
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 20px;
             width: 100%;
-            max-width: 400px;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 450px;
+            transition: all 0.4s ease;
             text-align: left;
+            position: relative;
         }
 
         .glass-card:hover {
-            transform: translateY(-5px);
             border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+            transform: scale(1.02);
         }
 
         .highlight-text {
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            padding: 4px 12px;
-            border-radius: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            padding: 6px 16px;
+            border-radius: 8px;
             color: white;
             font-weight: 700;
-            font-size: 14px;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin: 15px 0 5px;
-            font-weight: 700;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-        }
-
-        .sub-title {
-            font-size: 12px;
-            color: #94a3b8;
-            letter-spacing: 3px;
+            font-size: 13px;
             text-transform: uppercase;
         }
 
-        /* Навигация */
-        .bottom-nav {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 40px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        h1 {
+            font-size: 2.8rem;
+            margin: 20px 0;
+            background: linear-gradient(to right, #fff, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
         }
 
-        .nav-item {
-            color: #64748b;
-            text-decoration: none;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 10px 15px;
-            border-radius: 20px;
-            transition: 0.3s;
-        }
-
-        .nav-item.active {
-            color: var(--primary);
-            background: rgba(0, 242, 254, 0.15);
-            box-shadow: inset 0 0 10px rgba(0, 242, 254, 0.1);
-        }
-
+        /* Музыка батырмасы */
         #musicToggle {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 25px;
+            right: 25px;
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(15, 23, 42, 0.8);
-            color: var(--primary);
-            z-index: 1001;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            z-index: 2000;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
             transition: 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        #musicToggle.playing {
-            animation: rotate 4s linear infinite;
-            border-color: var(--primary);
-            box-shadow: 0 0 15px var(--primary);
+        .playing {
+            animation: rotate 5s linear infinite;
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
         }
 
         @keyframes rotate {
@@ -161,93 +137,85 @@
             to { transform: rotate(360deg); }
         }
 
-        .btn-action {
-            margin-top: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            padding: 12px 30px;
+        /* Навигация */
+        .bottom-nav {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
             border-radius: 50px;
+            display: flex;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .nav-item {
+            color: #94a3b8;
             text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            display: inline-block;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 12px 18px;
+            border-radius: 25px;
             transition: 0.3s;
         }
 
-        .btn-action:active {
-            transform: scale(0.95);
-            background: var(--primary);
-            color: var(--bg);
+        .nav-item.active {
+            color: white;
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
         }
 
         .btn-main {
-            margin-top: 25px;
-            background: linear-gradient(90deg, #7000ff, #ff00c8);
+            margin-top: 30px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
             color: white;
-            padding: 15px 50px;
+            padding: 18px 50px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 700;
             display: inline-block;
-            box-shadow: 0 5px 20px rgba(112, 0, 255, 0.4);
             transition: 0.3s;
+            border: none;
+            box-shadow: 0 10px 20px rgba(112, 0, 255, 0.3);
+            cursor: pointer;
         }
 
-        .gift-badge {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px dashed #ffd700;
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        .prog-time {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: block;
         }
 
         .prog-title {
             font-weight: 700;
-            font-size: 15px;
-            color: var(--primary);
+            font-size: 16px;
+            color: white;
+            margin-bottom: 5px;
             display: block;
         }
 
-        .prog-desc {
-            font-size: 11px;
-            color: #cbd5e1;
-            margin-top: 5px;
-            display: block;
-            line-height: 1.5;
-        }
-
-        .invite-text {
-            font-size: 15px;
-            line-height: 1.8;
-            color: #e2e8f0;
-            max-width: 320px;
-            margin: 20px 0;
-            font-weight: 300;
-        }
-
-        /* Ұйымдастырушылар */
-        .team-list {
+        .gift-badge {
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), transparent);
+            border: 1px dashed #ffd700;
+            padding: 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
             width: 100%;
-            max-width: 400px;
-            text-align: left;
-            margin-top: 10px;
+            max-width: 450px;
         }
 
         .team-item {
             padding: 12px;
             margin-bottom: 8px;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.04);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -264,7 +232,6 @@
             justify-content: center;
             font-size: 10px;
             font-weight: 700;
-            box-shadow: 0 0 10px rgba(112, 0, 255, 0.3);
         }
     </style>
 </head>
@@ -272,73 +239,82 @@
 
     <canvas id="canvas-bg"></canvas>
 
-    <audio id="bgAudio" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    <!-- Музыка - Сайтқа кез келген жерді басқанда ойнай бастайды -->
+    <audio id="bgAudio" loop preload="auto">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3" type="audio/mpeg">
     </audio>
 
     <button id="musicToggle" onclick="toggleMusic()">♪</button>
 
     <nav class="bottom-nav">
-        <a href="#home" class="nav-item active" id="n-home">Басты</a>
-        <a href="#program" class="nav-item" id="n-program">Кесте</a>
-        <a href="#team" class="nav-item" id="n-team">Ұжым</a>
+        <a href="#home" class="nav-item active" id="n-home">БАСТЫ</a>
+        <a href="#program" class="nav-item" id="n-program">БАҒДАРЛАМА</a>
+        <a href="#team" class="nav-item" id="n-team">ШАҚЫРУ</a>
     </nav>
 
     <!-- 1-БЕТ -->
-    <section id="home" class="section">
-        <div class="sub-title">Инновациялық Апталық</div>
+    <section id="home" class="section visible">
+        <div class="sub-title orbitron">Digital Teachers</div>
         <h1 class="orbitron">Жас маман 2.0</h1>
-        <div style="margin-bottom: 25px;">
+        <div style="margin-bottom: 30px;">
             <span class="highlight-text">ЖИ дәуіріндегі ұстаз</span>
         </div>
         
-        <div class="glass-card" style="text-align: center; border: 1px solid rgba(0, 242, 254, 0.3);">
-            <div style="font-size: 10px; color: var(--primary); letter-spacing: 2px;">УАҚЫТЫ</div>
-            <div style="font-size: 20px; font-weight: 700; margin: 5px 0;">12.05.2026 | 07:30</div>
-            <div style="width: 30px; height: 1px; background: rgba(255,255,255,0.2); margin: 15px auto;"></div>
-            <div style="font-size: 10px; color: var(--primary); letter-spacing: 2px;">ОРНЫ</div>
-            <div style="font-size: 14px;">ФАЕ (негізгі кіреберіс)</div>
+        <div class="glass-card" style="text-align: center;">
+            <p style="font-size: 11px; color: var(--primary); letter-spacing: 2px;">УАҚЫТЫ</p>
+            <p style="font-size: 24px; font-weight: 700; margin: 5px 0;">12 МАМЫР | 07:30</p>
+            <p style="font-size: 11px; color: var(--primary); letter-spacing: 2px; margin-top: 15px;">ОРНЫ</p>
+            <p style="font-size: 15px;">ФАЕ (негізгі кіреберіс)</p>
         </div>
 
-        <a href="#program" class="btn-main">БАСТАУ</a>
+        <a href="#program" class="btn-main orbitron">ТАНЫСУ</a>
     </section>
 
     <!-- 2-БЕТ -->
     <section id="program" class="section">
-        <h2 class="orbitron" style="font-size: 18px; margin-bottom: 20px; color: var(--primary);">ІС-ШАРАЛАР КЕСТЕСІ</h2>
+        <h2 class="orbitron" style="font-size: 20px; margin-bottom: 30px; color: var(--primary);">БАҒДАРЛАМА</h2>
         
         <div class="glass-card">
-            <span class="prog-title">07:30 - 08:00 | Салтанатты қарсы алу</span>
-            <span class="prog-desc">Ұстаздар мен оқушыларды музыкалық сүйемелдеумен және фуршетпен қарсы алу.</span>
+            <span class="prog-time">07:30 - 08:00</span>
+            <span class="prog-title">Салтанатты қарсы алу</span>
+            <p style="font-size: 13px; color: #cbd5e1;">Әсем әуенмен жас мамандардың ұйымдастыруымен мұғалімдер мен оқушыларды қарсы алу.</p>
         </div>
 
         <div class="glass-card">
-            <span class="prog-title">08:45 - 08:50 | Көңілді үзіліс</span>
-            <span class="prog-desc">Жасанды интеллект элементтері бар интерактивті ойындар мен викториналар.</span>
+            <span class="prog-time">08:45 - 08:50</span>
+            <span class="prog-title">Көңілді үзіліс</span>
+            <p style="font-size: 13px; color: #cbd5e1;">Оқушыларға арналған «Ұлттық code» және «Magic straw words» ойындары.</p>
+        </div>
+
+        <div class="glass-card" style="border-left: 4px solid var(--accent);">
+            <span class="prog-time">08:55 - 09:30</span>
+            <span class="prog-title">«Ұстаздарға арналған FUN time»</span>
+            <p style="font-size: 13px; color: #cbd5e1;">Жас мамандардың ұйымдастыруында мектеп ұжымымен көңілді ойындар мен тапсырмалар.</p>
         </div>
 
         <div class="glass-card">
-            <span class="prog-title">08:55 - 09:30 | Fun Time (Мұғалімдер)</span>
-            <span class="prog-desc">Ұстаздар қауымына арналған релаксация және қызықты тапсырмалар.</span>
+            <span class="prog-time">09:35 - 09:45</span>
+            <span class="prog-title">«Color Mix» ойыны</span>
+            <p style="font-size: 13px; color: #cbd5e1;">Оқушыларға арналған практикалық үзіліс және қызықты тәжірибе.</p>
         </div>
 
         <div class="gift-badge">
-            <span style="font-size: 24px;">🎁</span>
+            <span style="font-size: 28px;">🎁</span>
             <div style="text-align: left;">
-                <div style="font-size: 12px; font-weight: 700; color: #ffd700;">АРНАЙЫ СЫЙЛЫҚТАР</div>
-                <div style="font-size: 10px; color: rgba(255,255,255,0.7);">Әр ойын мен белсенділік соңында таратылады!</div>
+                <p style="font-size: 14px; font-weight: 800; color: #ffd700;">СЫЙЛЫҚТАР ТАЙМ</p>
+                <p style="font-size: 11px; color: rgba(255,255,255,0.7);">Белсенді қатысушыларға арналған тосын сыйлар!</p>
             </div>
         </div>
-
-        <a href="#team" class="btn-action">Ұйымдастырушылармен танысу →</a>
     </section>
 
     <!-- 3-БЕТ -->
     <section id="team" class="section">
-        <h2 class="orbitron" style="font-size: 18px; margin-bottom: 10px;">БІЗДІҢ КОМАНДА</h2>
+        <h2 class="orbitron" style="font-size: 20px; margin-bottom: 20px;">ШАҚЫРУ</h2>
         
-        <div class="invite-text">
-            Құрметті әріптестер мен оқушылар! Сіздерді жаңа технологиялар мен білімнің тоғысқан мекенінде күтеміз. Келіңіздер, бірге дамып, көңіл көтерейік!
+        <div class="glass-card" style="text-align: center; border-bottom: 4px solid var(--primary);">
+            <p style="font-size: 14px; line-height: 1.8; font-style: italic; color: #e2e8f0;">
+                "Құрметті әріптестер! Сіздерді жас мамандардың ұйымдастыруымен өтетін инновациялық апталыққа шақырамыз. Бірге жаңа белестерді бағындырайық!"
+            </p>
         </div>
 
         <div class="team-list">
@@ -353,53 +329,58 @@
             <div class="team-item"><div class="avatar">БА</div><span>Борантаева Асель</span></div>
         </div>
 
-        <div style="margin-top: 30px; font-size: 12px; color: var(--accent); font-weight: 700;" class="orbitron">
-            [ СІЗДІ КҮТЕМІЗ! ]
-        </div>
+        <p class="orbitron" style="margin-top: 30px; color: var(--primary); font-size: 12px;">[ СІЗДІ КҮТЕМІЗ ]</p>
         <div style="height: 100px;"></div>
     </section>
 
     <script>
+        // ФОНДАҒЫ ҚОЗҒАЛЫС (Ғарыштық ұшу эффектісі)
         const canvas = document.getElementById('canvas-bg');
         const ctx = canvas.getContext('2d');
         let stars = [];
 
-        function init() {
+        function initStars() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             stars = [];
-            for(let i=0; i<100; i++) {
+            for(let i=0; i<200; i++) {
                 stars.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    opacity: Math.random(),
-                    speed: 0.005 + Math.random() * 0.01
+                    z: Math.random() * canvas.width,
+                    size: 1 + Math.random() * 2
                 });
             }
         }
 
-        function draw() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
+        function drawStars() {
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'white';
             stars.forEach(s => {
-                ctx.fillStyle = `rgba(0, 242, 254, ${s.opacity})`;
+                const x = (s.x - canvas.width / 2) * (canvas.width / s.z) + canvas.width / 2;
+                const y = (s.y - canvas.height / 2) * (canvas.width / s.z) + canvas.height / 2;
+                const size = s.size * (canvas.width / s.z);
+                
+                const opacity = Math.max(0, 1 - (s.z / canvas.width));
+                ctx.globalAlpha = opacity;
                 ctx.beginPath();
-                ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+                ctx.arc(x, y, size/2, 0, Math.PI * 2);
                 ctx.fill();
-                s.opacity += s.speed;
-                if(s.opacity > 1 || s.opacity < 0) s.speed *= -1;
+                
+                s.z -= 1.5; // Қозғалыс жылдамдығы
+                if (s.z <= 0) {
+                    s.z = canvas.width;
+                    s.x = Math.random() * canvas.width;
+                    s.y = Math.random() * canvas.height;
+                }
             });
-            requestAnimationFrame(draw);
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(drawStars);
         }
 
-        window.onload = () => {
-            window.scrollTo(0, 0);
-            init();
-            draw();
-        };
-
-        window.onresize = init;
-
+        // МУЗЫКА БАСҚАРУ
         const audio = document.getElementById('bgAudio');
         const mBtn = document.getElementById('musicToggle');
         let isPlaying = false;
@@ -407,30 +388,64 @@
         function toggleMusic() {
             if(isPlaying) {
                 audio.pause();
-                mBtn.innerText = '♪';
                 mBtn.classList.remove('playing');
+                mBtn.innerText = '♪';
             } else {
-                audio.play();
-                mBtn.innerText = '||';
-                mBtn.classList.add('playing');
+                // Ойнату кезіндегі қателерді өңдеу
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        mBtn.classList.add('playing');
+                        mBtn.innerText = '||';
+                        isPlaying = true;
+                    }).catch(error => {
+                        console.log("Дыбыс қосылмады: ", error);
+                    });
+                }
             }
-            isPlaying = !isPlaying;
+            if (isPlaying && audio.paused) isPlaying = false;
         }
 
-        window.onscroll = () => {
-            const sections = ['home', 'program', 'team'];
-            sections.forEach(id => {
-                const el = document.getElementById(id);
-                const nav = document.getElementById('n-' + id);
-                if (el && nav) {
-                    const rect = el.getBoundingClientRect();
-                    if(rect.top < 300 && rect.bottom > 300) {
-                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                        nav.classList.add('active');
-                    }
+        // Автоматты қосылу механизмі (Браузер рұқсаты үшін экранды басу қажет)
+        document.addEventListener('click', function() {
+            if (!isPlaying) {
+                toggleMusic();
+            }
+        }, { once: true });
+
+        // СКРОЛЛ АНИМАЦИЯСЫ
+        function handleReveal() {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(sec => {
+                const rect = sec.getBoundingClientRect();
+                if(rect.top < window.innerHeight - 100) {
+                    sec.classList.add('visible');
                 }
             });
+
+            // Навигация активтеу
+            sections.forEach(sec => {
+                const rect = sec.getBoundingClientRect();
+                if(rect.top < 300 && rect.bottom > 300) {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    const nav = document.getElementById('n-' + sec.id);
+                    if(nav) nav.classList.add('active');
+                }
+            });
+        }
+
+        window.onload = () => {
+            initStars();
+            drawStars();
+            window.scrollTo(0, 0);
+            
+            // Кейбір жағдайда скролл кезінде де қосылуы мүмкін
+            window.addEventListener('scroll', function() {
+                if (!isPlaying) toggleMusic();
+            }, { once: true });
         };
+        window.onresize = initStars;
+        window.onscroll = handleReveal;
     </script>
 </body>
 </html>
