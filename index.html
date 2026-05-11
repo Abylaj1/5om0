@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Жас маман 2.0</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@300;400;700&display=swap');
+        
+        :root {
+            --primary: #00f2fe;
+            --secondary: #7000ff;
+            --accent: #ff00c8;
+            --bg: #030712;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Футуристік анимациялық фон */
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+        }
+
+        .ai-glow {
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.7);
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 16px;
+            width: 100%;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card:active {
+            transform: scale(1.02);
+            border-color: var(--primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 10px 0;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-shadow: 0 0 15px var(--primary);
+            animation: scan 3s linear infinite;
+            z-index: 10;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        /* Навигация */
+        .bottom-nav {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(3, 7, 18, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 25px;
+            border-radius: 50px;
+            display: flex;
+            gap: 20px;
+            z-index: 2000;
+        }
+
+        .nav-item {
+            color: #4b5563;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        /* Музыка батырмасы */
+        #musicToggle {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid var(--primary);
+            background: rgba(0,0,0,0.5);
+            color: var(--primary);
+            z-index: 2001;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            animation: ring-pulse 2s infinite;
+        }
+
+        @keyframes ring-pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .grid-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .time-badge {
+            background: rgba(0, 242, 254, 0.1);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            border: 1px solid var(--primary);
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .team-box {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .member-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 242, 254, 0.1);
+            padding: 12px 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1e293b;
+            font-size: 12px;
+            color: var(--primary);
+            flex-shrink: 0;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .member-name {
+            font-size: 13px;
+            font-weight: 400;
+            color: #e2e8f0;
+        }
+
+        .tag {
+            font-size: 10px;
+            color: var(--primary);
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .btn-primary {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1px solid var(--primary);
+            padding: 15px 30px;
+            border-radius: 50px;
+            background: rgba(0, 242, 254, 0.1);
+            transition: 0.3s;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-bg"></canvas>
+    <div class="scan-line"></div>
+
+    <audio id="bgAudio" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" type="audio/mpeg">
+    </audio>
+
+    <button id="musicToggle" onclick="toggleMusic()">
+        <div class="pulse-ring" id="ring" style="display: none;"></div>
+        <span id="mIcon">♪</span>
+    </button>
+
+    <nav class="bottom-nav">
+        <a href="#home" class="nav-item active" id="n-home">Басты бет</a>
+        <a href="#program" class="nav-item" id="n-program">Бағдарлама</a>
+        <a href="#team" class="nav-item" id="n-team">Ұйымдастырушылар</a>
+    </nav>
+
+    <!-- БАСТЫ БӨЛІМ -->
+    <section id="home" class="section">
+        <div style="font-size: 12px; color: var(--primary); margin-bottom: 10px; letter-spacing: 3px;">[ ЖҮЙЕ ҚОСЫЛДЫ ]</div>
+        <h1 class="orbitron">ЖАС МАМАН 2.0</h1>
+        <h2 style="font-weight: 300; opacity: 0.8; margin-bottom: 30px;">Жанды интеллект дәуіріндегі ұстаз</h2>
+        
+        <div class="grid-info">
+            <div class="glass-card">
+                <div class="tag">Өтетін күні</div>
+                <div style="font-size: 20px; font-weight: 700;">12.05</div>
+            </div>
+            <div class="glass-card">
+                <div class="tag">Басталуы</div>
+                <div style="font-size: 20px; font-weight: 700;">07:30</div>
+            </div>
+            <div class="glass-card" style="grid-column: span 2;">
+                <div class="tag">Өтетін орны</div>
+                <div style="font-weight: 700;">ФАЕ Холл • Негізгі кіреберіс</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 50px;">
+            <a href="#program" class="btn-primary">БАҒДАРЛАМАМЕН ТАНЫСУ ↓</a>
+        </div>
+    </section>
+
+    <!-- БАҒДАРЛАМА БӨЛІМІ -->
+    <section id="program" class="section">
+        <h2 class="orbitron ai-glow" style="margin-bottom: 30px;">ІС-ШАРАЛАР КЕСТЕСІ</h2>
+        <div style="width: 100%; max-width: 500px; margin-bottom: 100px;">
+            
+            <!-- 1-шара -->
+            <div class="glass-card" style="text-align: left; display: flex; flex-direction: column; gap: 10px; padding: 20px;">
+                <div class="time-badge">07:30 - 08:00</div>
+                <div>
+                    <div style="font-weight: 700; color: var(--primary); font-size: 15px;">ҚАРСЫ АЛУ ЖӘНЕ ФУРШЕТ</div>
+                    <p style="font-size: 12px; color: #cbd5e1; margin: 8px 0; line-height: 1.5;">
+                        Мұғалімдер мен оқушыларды әсем әуенмен қарсы алу. Ұстаздарға кофе мен попкорн, оқушыларға бауырсақ таратылады.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2-шара -->
+            <div class="glass-card" style="text-align: left; display: flex; flex-direction: column; gap: 10px; border-left: 4px solid var(--accent); padding: 20px;">
+                <div class="time-badge" style="border-color: var(--accent); color: var(--accent);">08:45 - 08:50</div>
+                <div>
+                    <div style="font-weight: 700; color: var(--accent); font-size: 15px;">КӨҢІЛДІ ҮЗІЛІС (ОҚУШЫЛАР)</div>
+                    <p style="font-size: 12px; color: #cbd5e1; margin: 8px 0; line-height: 1.5;">
+                        «Ұлттық code» және «Magic straw words» ойындары. Жасанды интеллект көмегімен өткізіледі.
+                    </p>
+                    <div class="tag" style="font-style: italic;">Ұйымдастырушылар: Назерке, Сандуғаш</div>
+                </div>
+            </div>
+
+            <!-- 3-шара -->
+            <div class="glass-card" style="text-align: left; display: flex; flex-direction: column; gap: 10px; border-left: 4px solid var(--secondary); padding: 20px;">
+                <div class="time-badge" style="border-color: var(--secondary); color: var(--secondary);">08:55 - 09:30</div>
+                <div>
+                    <div style="font-weight: 700; color: var(--secondary); font-size: 15px;">ҰСТАЗДАРҒА АРНАЛҒАН FUN TIME</div>
+                    <p style="font-size: 12px; color: #cbd5e1; margin: 8px 0; line-height: 1.5;">
+                        Мектеп ұжымымен әртүрлі форматтағы көңілді ойындар мен тапсырмалар.
+                    </p>
+                    <div class="tag" style="font-style: italic;">Ұйымдастырушылар: Асель, Анель, Нұрлыбек, Ділназ</div>
+                </div>
+            </div>
+
+            <!-- 4-шара -->
+            <div class="glass-card" style="text-align: left; display: flex; flex-direction: column; gap: 10px; border-left: 4px solid #4ade80; padding: 20px;">
+                <div class="time-badge" style="border-color: #4ade80; color: #4ade80;">09:35 - 09:45</div>
+                <div>
+                    <div style="font-weight: 700; color: #4ade80; font-size: 15px;">COLOR MIX ОЙЫНЫ</div>
+                    <p style="font-size: 12px; color: #cbd5e1; margin: 8px 0; line-height: 1.5;">
+                        Оқушыларға арналған практикалық үзіліс ойыны.
+                    </p>
+                    <div class="tag" style="font-style: italic;">Ұйымдастырушылар: Малика, Гүлмира</div>
+                </div>
+            </div>
+
+            <div style="font-size: 11px; color: var(--accent); margin-top: 20px; font-weight: 700;" class="orbitron">
+                🎁 ӘР ОЙЫНҒА ҚОСЫМША СЫЙЛЫҚТАР ТАРАТЫЛАДЫ
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ҰЙЫМДАСТЫРУШЫЛАР БӨЛІМІ -->
+    <section id="team" class="section">
+        <h2 class="orbitron ai-glow" style="margin-bottom: 30px;">ҰЙЫМДАСТЫРУШЫЛАР</h2>
+        <div class="team-box">
+            
+            <div class="member-card">
+                <div class="member-avatar">ӘА</div>
+                <div class="member-name">Әбен Абылай</div>
+            </div>
+
+            <div class="member-card">
+                <div class="member-avatar">АН</div>
+                <div class="member-name">Арепбаев Нұрлыбек</div>
+            </div>
+
+            <div class="member-card">
+                <div class="member-avatar">СМ</div>
+                <div class="member-name">Сақтау Малика</div>
+            </div>
+
+            <div class="member-card">
+                <div class="member-avatar">БН</div>
+                <div class="member-name">Боранбайқызы Назерке</div>
+            </div>
+
+            <div class="member-card">
+                <div class="member-avatar">ИС</div>
+                <div class="member-name">Испандиярова Сандуғаш</div>
+            </div>
+
+            <div class="member-card">
+                <div class="member-avatar">БА</div>
+                <div class="member-name">Бектұрған Анель</div>
+            </div>
+
+            <div class="member-card">
+                <div class="member-avatar">ЖГ</div>
+                <div class="member-name">Жапбарова Гүлмира</div>
+            </div>
+
+            <div class="member-card">
+                <div class="member-avatar">ӘД</div>
+                <div class="member-name">Әбіш Дильназ</div>
+            </div>
+
+            <div class="member-card">
+                <div class="member-avatar">БА</div>
+                <div class="member-name">Борантаева Асель</div>
+            </div>
+
+        </div>
+        
+        <div style="margin-top: 60px; font-size: 11px; color: #4b5563; letter-spacing: 2px;" class="orbitron">
+            [ КҮТЕМІЗ! ]
+        </div>
+        <div style="height: 100px;"></div>
+    </section>
+
+    <script>
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.speedY = Math.random() * 0.4 - 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width || this.x < 0 || this.y > canvas.height || this.y < 0) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(0, 242, 254, 0.4)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function createParticles() {
+            particles = [];
+            for (let i = 0; i < 60; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = () => {
+            initCanvas();
+            createParticles();
+            animate();
+        };
+
+        window.onresize = () => {
+            initCanvas();
+            createParticles();
+        };
+
+        const audio = document.getElementById('bgAudio');
+        const icon = document.getElementById('mIcon');
+        const ring = document.getElementById('ring');
+        let playing = false;
+
+        function toggleMusic() {
+            if (playing) {
+                audio.pause();
+                icon.innerHTML = '♪';
+                ring.style.display = 'none';
+            } else {
+                audio.play();
+                icon.innerHTML = '||';
+                ring.style.display = 'block';
+            }
+            playing = !playing;
+        }
+
+        document.body.addEventListener('click', () => {
+            if (!playing) {
+                audio.play().then(() => {
+                    playing = true;
+                    icon.innerHTML = '||';
+                    ring.style.display = 'block';
+                }).catch(() => {});
+            }
+        }, { once: true });
+
+        window.onscroll = () => {
+            const sections = ['home', 'program', 'team'];
+            sections.forEach(id => {
+                const el = document.getElementById(id);
+                const link = document.getElementById('n-' + id);
+                if (el) {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top <= 250 && rect.bottom >= 250) {
+                        document.querySelectorAll('.nav-item').forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+</html>
